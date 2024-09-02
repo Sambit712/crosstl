@@ -4,7 +4,7 @@ from .OpenglLexer import *
 
 
 class GLSLToCrossGLConverter:
-    def __init__(self):
+    def __init__(self):    
         self.current_shader = None
         self.vertex_item = None
         self.fragment_item = None
@@ -41,7 +41,8 @@ class GLSLToCrossGLConverter:
             code += "\n"
 
             # Generate functions
-            code += self.generate_functions(self.vertex_item.functions, "vertex")
+            code += self.generate_functions(
+                self.vertex_item.functions, "vertex")
             code += "    }\n"
         else:
             raise ValueError("No vertex shader section to generate.")
@@ -63,7 +64,8 @@ class GLSLToCrossGLConverter:
             code += "\n"
 
             # Generate functions
-            code += self.generate_functions(self.fragment_item.functions, "fragment")
+            code += self.generate_functions(
+                self.fragment_item.functions, "fragment")
             code += "    }\n"
         else:
             raise ValueError("No fragment shader section to generate.")
@@ -134,7 +136,7 @@ class GLSLToCrossGLConverter:
 
     def generate_if(self, node: IfNode, shader_type, indent=0):
         indent_str = "    " * indent
-        code = f"{indent_str}if {self.generate_expression(node.condition, shader_type)} {{\n"
+        code = f"{indent_str}if ({self.generate_expression(node.condition, shader_type)}) {{\n"
         for stmt in node.if_body:
             code += self.generate_statement(stmt, shader_type, indent + 1)
         code += f"{indent_str}}}"
@@ -157,7 +159,7 @@ class GLSLToCrossGLConverter:
         return code
 
     def generate_else_if(self, node: IfNode, shader_type, indent):
-        code = f" else if {self.generate_expression(node.condition, shader_type)} {{\n"
+        code = f" else if ({self.generate_expression(node.condition, shader_type)}) {{\n"
         for stmt in node.if_body:
             code += self.generate_statement(stmt, shader_type, indent + 1)
         code += f"{'    ' * indent}}}"
@@ -165,9 +167,12 @@ class GLSLToCrossGLConverter:
 
     def generate_for(self, node: ForNode, shader_type, indent):
         indent_str = "    " * indent
-        init = self.generate_statement(node.init, shader_type).strip().rstrip(";")
-        condition = self.generate_expression(node.condition, shader_type).strip()
-        update = self.generate_update(node.update, shader_type).strip().rstrip(";")
+        init = self.generate_statement(
+            node.init, shader_type).strip().rstrip(";")
+        condition = self.generate_expression(
+            node.condition, shader_type).strip()
+        update = self.generate_update(
+            node.update, shader_type).strip().rstrip(";")
         code = f"{indent_str}for ({init}; {condition}; {update}) {{\n"
         for stmt in node.body:
             code += self.generate_statement(stmt, shader_type, indent + 1)
@@ -195,7 +200,8 @@ class GLSLToCrossGLConverter:
                 return f"{lhs} = {rhs}"
 
         elif isinstance(node, UnaryOpNode):
-            operand = self.generate_expression(node.operand, shader_type).strip()
+            operand = self.generate_expression(
+                node.operand, shader_type).strip()
             if node.op == "++":
                 return f"++{operand}"
             elif node.op == "POST_INCREMENT":
